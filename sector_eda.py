@@ -3,8 +3,7 @@ Reusable sector-level EDA -- run this instead of re-deriving the same
 groupby logic in a notebook each time.
 
 load_clean_sector_df(name) is the canonical "give me a ready-to-analyze
-dataframe" entry point: load -> normalize categoricals -> apply confirmed
-cleanup (DECISIONS.md) -> assign + merge NAICS sector -> reconcile
+dataframe" entry point: load -> normalize categoricals -> apply confirmed cleanup -> assign + merge NAICS sector -> reconcile
 BusinessAge buckets -> assign binary target. Every other function here
 takes that dataframe as input.
 
@@ -64,8 +63,7 @@ def sector_chargeoff_table(df):
     """
     Full sparse-sector table -- every sector, both chargeoff-rate
     definitions (of resolved PIF+CHGOFF only, vs. of all loans including
-    CANCLD/EXEMPT/COMMIT), sorted by CHGOFF event count (not loan count --
-    see DECISIONS.md on why event count is the more relevant threshold).
+    CANCLD/EXEMPT/COMMIT), sorted by CHGOFF event count (not loan count -- the number of charge-off events is what makes a sector's rate reliable).
     """
     total = df.groupby("NaicsSectorName").size()
     pif = df[df["LoanStatus"] == "PIF"].groupby("NaicsSectorName").size()

@@ -4,8 +4,7 @@ PD model, step 1: vintage-normalized target construction.
 Fixes a bias in the raw resolved-basis rate (CHGOFF / (PIF+CHGOFF)): that
 rate isn't comparable across vintages, because CHGOFF tends to happen
 faster than PIF, so recent loans look artificially riskier than they are
-just from lack of time, not real credit deterioration. See
-MODELING_NOTES.md for the full explanation and the chart that proves it.
+just from lack of time, not real credit deterioration. The chart outputs/figures/pd_model/01_vintage_normalization_validation.png shows the effect.
 
 Fix: only judge a loan once it's had a full 60-month window to prove
 itself, and ask the same question of every loan -- "did it default within
@@ -159,7 +158,7 @@ def validate_against_old_rate(df, n_months=60):
         ax.set_xlabel("ApprovalFY")
         ax.set_ylabel("default rate %")
         ax.legend()
-    fig.suptitle("Vintage-normalization validation: old vs. new rate by ApprovalFY")
+    fig.suptitle(f"{n_months}-month window validation: naive rate vs. {n_months}-month rate by ApprovalFY")
     fig.tight_layout()
     fig.savefig(f"{OUT}/01_vintage_normalization_validation.png", dpi=150)
     plt.close(fig)

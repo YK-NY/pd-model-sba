@@ -1,13 +1,7 @@
 """
 Consolidated load + preliminary EDA for the SBA 7(a) FOIA files.
-
-Both notebooks/Data_2010_2019.ipynb and notebooks/Data_2020_curr.ipynb run
-the exact same sequence of checks against two different raw files. This
-module consolidates that shared logic so it runs once, against both files,
-instead of being duplicated per-notebook.
-
-Run directly (`python src/data_prep/load_sba.py`) to load both files and
-print the full preliminary EDA / data-quality report for each.
+The same sequence of checks runs against the two raw files (FY2010-2019 and FY2020-current).
+This module holds that shared logic so it runs once, against both files
 """
 
 import re
@@ -332,7 +326,7 @@ def check_zip_code_length(df):
 def clean_confirmed_issues(df, verbose=True):
     """
     Applies the cleaning decisions that have actually been confirmed and
-    settled (see DECISIONS.md, "Cleaning rules applied"). 
+    settled.
     Assumes normalize_categoricals(df) has already been run.
 
     Each rule is applied and counted separately so the effect of any single
@@ -348,7 +342,7 @@ def clean_confirmed_issues(df, verbose=True):
     # PaidInFullDate or ChargeOffDate on an EXEMPT row contradicts that
     df = df[~((df["LoanStatus"] == "EXEMPT") & (df["PaidInFullDate"].notna() | df["ChargeOffDate"].notna()))]
 
-    # fully duplicated rows (FOIA export artifact, see DECISIONS.md)
+    # fully duplicated rows (FOIA export artifact)
     df = df[~df.duplicated(keep="first")]
 
     # non-US BankZip entries (small count, real data but out of scope)
@@ -378,8 +372,8 @@ def clean_confirmed_issues(df, verbose=True):
 def assign_target(df, status_col="LoanStatus"):
     """
     Binary target: 1 = CHGOFF, 0 = PIF, NA for every other status
-    (CANCLD/EXEMPT/COMMIT). this does NOT filter rows, just labels
-    the two statuses that are unambiguous today. 
+    (CANCLD/EXEMPT/COMMIT). This does NOT filter rows, just labels
+    the two statuses that are unambiguous today.
     """
     df["target"] = df[status_col].map({"CHGOFF": 1, "PIF": 0})
     return df
